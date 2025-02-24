@@ -1,0 +1,10 @@
+[package]
+name = "thread_duct_reader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+duct = "0.13.7"
+log = "0.4.26"
+ringbuf = "0.4.7"
+simplelog = "0.12.2"
