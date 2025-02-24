@@ -1,17 +1,16 @@
 use duct::cmd;
-use log::{error, info};
 use ringbuf::{traits::*, StaticRb};
 use std::{io::Read, thread};
 
 pub const RB_SIZE: usize = 1024;
 
 fn main() {
-    let mut buffer = StaticRb::<u8, RB_SIZE>::default();
+    let buffer = StaticRb::<u8, RB_SIZE>::default();
     let (mut prod, mut cons) = buffer.split();
 
     // let mut buffer = StaticRb::<u8, 1024>::new();
 
-    let mut reader_thread = thread::spawn(move || {
+    let reader_thread = thread::spawn(move || {
         let mut reader = cmd("python", ["-u", "./test.py"])
             .stderr_to_stdout()
             .reader()
@@ -37,8 +36,8 @@ fn main() {
 
             match reader.try_wait() {
                 Ok(Some(exit)) => {
+                    println!("Observed that reader exited: {:?}", exit);
                     break;
-                    // done!
                 }
                 Ok(None) => {
                     // still going...
@@ -50,12 +49,7 @@ fn main() {
                 }
             }
         }
-        // while let Ok(data) = reader.read(&mut buffer) {
-        //     if data == 0 {
-        //         break;
-        //     }
-        // }
-    });
+    }); // NOTE: end reader_thread
 
     println!("hello from the main thread!");
     let mut recv_buf: Vec<u8> = vec![];
